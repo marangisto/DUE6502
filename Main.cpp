@@ -1,4 +1,7 @@
 #include <due.h>
+#include <UARTClass.h>
+
+extern UARTClass Serial;
 
 typedef output_t<D13> BOARD;
 typedef output_t<A0> LED0;
@@ -8,6 +11,7 @@ typedef output_t<A3> LED3;
 
 void setup()
 {
+    Serial.begin(115200);
     BOARD::setup();
     LED0::setup();
     LED1::setup();
@@ -47,5 +51,12 @@ void loop()
 
     delay(50);
     ++i;
+    int c;
+    while ((c = Serial.read()) > 0)
+    {
+        Serial.write("got '");
+        Serial.write(c);
+        Serial.write('\n');
+    }
 }
 
