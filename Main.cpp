@@ -54,7 +54,7 @@ void loop()
     int c;
     while ((c = Serial.read()) > 0)
     {
-        Serial.write("got '");
+        Serial.write('>');
         Serial.write(c);
         Serial.write('\n');
     }
