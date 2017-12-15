@@ -4,6 +4,7 @@
 #include <UART.h>
 #include <watchdog.h>
 #include <stdlib.h>
+#include "prog2.h"
 
 typedef uart_t uart;
 
@@ -207,6 +208,8 @@ static const uint16_t rom_start = 0xff00;
 
 static uint8_t ram[ram_size], rom[rom_size];
 
+static const uint16_t output_channel = 0xff00;  // memory location to write to serial
+
 static const uint8_t NOP = 0xea;
 static const uint8_t BRA = 0x80;
 static const uint8_t JMP = 0x6c;
@@ -241,6 +244,8 @@ static inline void write_memory(uint16_t addr, uint8_t x)
 {
     if (addr >= ram_start && addr < ram_start + ram_size)
         ram[addr - ram_start] = x;
+    else if (addr == output_channel)
+        uart::put_char(x);  // we are effectively blocking the cpu here
     else
     {
         print("invalid write address: 0x");
@@ -264,17 +269,17 @@ void loop()
         RESB::clear();
         delay(1);
         RESB::set();
-        initialize_memory(prog0, sizeof(prog0));
+        initialize_memory(prog2_text, prog2_size);
     }
 
     LED0::set(output0.toggle(i));
     LED1::set(output1.toggle(i));
     LED2::set(output2.toggle(i));
 
-    int c;
+ //   int c;
     bool step = false;
  
-    while ((c = uart::get_char()) > 0)
+//    while ((c = uart::get_char()) > 0)
         step = true;
 
     if (step)
@@ -286,28 +291,28 @@ void loop()
         {
             uint16_t addr = (hi_addr::read() << 8) | lo_addr::read();
 
-            print("a = 0x");
-            print(addr, 16, 4);
-            print(" ");
+            //print("a = 0x");
+            //print(addr, 16, 4);
+            //print(" ");
 
             if (RWB::get())         // reading data
             {
                 uint8_t x = read_memory(addr);
                 data::enable_output();
                 data::write(x);
-                print("r 0x");
-                print(x, 16, 2);
+                //print("r 0x");
+                //print(x, 16, 2);
             }
             else                    // writing data
             {
                 uint8_t x = data::read();
                 write_memory(addr, x);
-                print("w 0x");
-                print(x, 16, 2);
+                //print("w 0x");
+                //print(x, 16, 2);
             }
-            print(" ");
-            print(status_str());
-            println();
+            //print(" ");
+            //print(status_str());
+            //println();
         }
         else                      // falling edge
         {
