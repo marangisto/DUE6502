@@ -8,14 +8,14 @@
 //
 ////
 
-typedef input_t<pin_t<PC, 5> > D0;
-typedef input_t<pin_t<PC, 4> > D1;
-typedef input_t<pin_t<PC, 3> > D2;
-typedef input_t<pin_t<PC, 2> > D3;
-typedef input_t<pin_t<PC, 1> > D4;
-typedef input_t<pin_t<PD, 10> > D5;
-typedef input_t<pin_t<PA, 7> > D6;
-typedef input_t<pin_t<PD, 9> > D7;
+typedef inout_t<pin_t<PC, 5> > D0;
+typedef inout_t<pin_t<PC, 4> > D1;
+typedef inout_t<pin_t<PC, 3> > D2;
+typedef inout_t<pin_t<PC, 2> > D3;
+typedef inout_t<pin_t<PC, 1> > D4;
+typedef inout_t<pin_t<PD, 10> > D5;
+typedef inout_t<pin_t<PA, 7> > D6;
+typedef inout_t<pin_t<PD, 9> > D7;
 
 typedef input_t<pin_t<PA, 16> > A0;
 typedef input_t<pin_t<PA, 24> > A1;
