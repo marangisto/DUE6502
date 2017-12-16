@@ -210,23 +210,44 @@ static uint8_t ram[ram_size], rom[rom_size];
 
 static const uint16_t output_channel = 0xff00;  // memory location to write to serial
 
-static const uint8_t NOP = 0xea;
-static const uint8_t BRA = 0x80;
-static const uint8_t JMP = 0x6c;
-
-static const uint8_t prog0[] = { NOP, NOP, NOP, NOP, NOP, BRA, static_cast<uint8_t>(-7) };
-
-static void initialize_memory(const uint8_t *pgm = 0, size_t pgm_len = 0)
+static void initialize_memory()
 {
     for (size_t i = 0; i < ram_size; ++i)
         ram[i] = 0;
 
-    for (size_t i = 0; i < pgm_len; ++i)
-        ram[i] = pgm[i];
-
     for (size_t i = 0; i < rom_size; ++i)
         rom[i] = 0;
 }
+
+static inline void copy(unsigned char *dst, const unsigned char *src, unsigned n)
+{
+    while (n-- > 0)
+        *dst++ = *src++;
+}
+
+static void load_record(unsigned addr, const unsigned char *data, unsigned size)
+{
+    if (addr >= ram_start && addr + size < ram_start + ram_size)
+        copy(ram + addr - ram_start, data, size);
+    else if (addr >= rom_start && addr + size < rom_start + rom_size)
+        copy(rom + addr - rom_start, data, size);
+    else
+    {
+        print("invalid load address: 0x");
+        print(addr, 16, 4);
+        print(" for size ");
+        print(size, 16, 2);
+        println();
+    }
+}
+
+static void load_program(const struct record *recs, unsigned nrecs)
+{
+    for (size_t i = 0; i < nrecs; ++i)
+        load_record(recs[i].addr, recs[i].data, recs[i].size);
+    println("program load complete");
+}
+
 
 static inline uint8_t read_memory(uint16_t addr)
 {
@@ -234,7 +255,7 @@ static inline uint8_t read_memory(uint16_t addr)
         return ram[addr - ram_start];
     if (addr >= rom_start && addr < rom_start + rom_size)
         return rom[addr - rom_start];
-    print("invalid write address: 0x");
+    print("invalid read address: 0x");
     print(addr, 16, 4);
     println();
     return 0;
@@ -269,7 +290,8 @@ void loop()
         RESB::clear();
         delay(1);
         RESB::set();
-        initialize_memory(prog2_text, prog2_size);
+        initialize_memory();
+        load_program(prog2_records, prog2_num_records);
     }
 
     LED0::set(output0.toggle(i));
