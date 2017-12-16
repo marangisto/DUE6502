@@ -4,66 +4,9 @@
 #include <UART.h>
 #include <watchdog.h>
 #include <stdlib.h>
-#include "prog2.h"
+#include "TinyBasic.h"
 
 typedef uart_t uart;
-
-void setup()
-{
-    uart::setup<115200>();
-
-    LED0::setup();
-    LED1::setup();
-    LED2::setup();
-
-    // configure pins
-    D0::setup();
-    D1::setup();
-    D2::setup();
-    D3::setup();
-    D4::setup();
-    D5::setup();
-    D6::setup();
-    D7::setup();
-    A0::setup();
-    A1::setup();
-    A2::setup();
-    A3::setup();
-    A4::setup();
-    A5::setup();
-    A6::setup();
-    A7::setup();
-    A8::setup();
-    A9::setup();
-    A10::setup();
-    A11::setup();
-    A12::setup();
-    A13::setup();
-    A14::setup();
-    A15::setup();
-    BE::setup();
-    MLB::setup();
-    RWB::setup();
-    RDY::setup<pull_up>();    // using pull-up as this pin is potenially an output on 6502
-    SYNC::setup();
-    SOB::setup();
-    PHI2::setup();
-    PHI1O::setup();
-    PHI2O::setup();
-    RESB::setup();
-    IRQB::setup();
-    NMIB::setup();
-    VBP::setup();
-
-    // initial values
-
-    SOB::set();             // set overflow
-    IRQB::set();            // interrupt request
-    NMIB::set();            // non-maskable interrupt
-    RESB::set();            // don't hold reset
-    PHI2::clear();          // start with low clock
-    BE::set();              // bus enable
-}
 
 template<class T7, class T6, class T5, class T4, class T3, class T2, class T1, class T0>
 struct byte_t
@@ -201,14 +144,16 @@ static inline void print_state(int i)
     println();
 }
 
-static const uint16_t ram_size = 1024;
-static const uint16_t ram_start = 0x0;
-static const uint16_t rom_size = 256;
-static const uint16_t rom_start = 0xff00;
+static const uint16_t ram_size  = 0x2000;
+static const uint16_t ram_start = 0x0000;
+static const uint16_t rom_size  = 0x1000;
+static const uint16_t rom_start = 0xf000;
+
+static const uint16_t uart_send_chr	= 0xeff0;
+static const uint16_t uart_recv_chr	= 0xeff1;
+static const uint16_t uart_recv_sts	= 0xeff2;
 
 static uint8_t ram[ram_size], rom[rom_size];
-
-static const uint16_t output_channel = 0xff00;  // memory location to write to serial
 
 static void initialize_memory()
 {
@@ -251,10 +196,25 @@ static void load_program(const struct record *recs, unsigned nrecs)
 
 static inline uint8_t read_memory(uint16_t addr)
 {
+    static uint8_t chr_val;
+
     if (addr >= ram_start && addr < ram_start + ram_size)
         return ram[addr - ram_start];
     if (addr >= rom_start && addr < rom_start + rom_size)
         return rom[addr - rom_start];
+    if (addr == uart_recv_sts)
+    {
+        int x = uart::get_char();
+        if (x >= 0)
+        {
+            chr_val = static_cast<uint8_t>(x);
+            return 0x1;
+        }
+        else
+            return 0;
+    }
+    if (addr == uart_recv_chr)
+        return chr_val;
     print("invalid read address: 0x");
     print(addr, 16, 4);
     println();
@@ -265,14 +225,79 @@ static inline void write_memory(uint16_t addr, uint8_t x)
 {
     if (addr >= ram_start && addr < ram_start + ram_size)
         ram[addr - ram_start] = x;
-    else if (addr == output_channel)
-        uart::put_char(x);  // we are effectively blocking the cpu here
+    else if (addr == uart_send_chr)
+        uart::put_char(x);
     else
     {
         print("invalid write address: 0x");
         print(addr, 16, 4);
         println();
     }
+}
+
+void setup()
+{
+    uart::setup<115200>();
+
+    LED0::setup();
+    LED1::setup();
+    LED2::setup();
+
+    // configure pins
+    D0::setup();
+    D1::setup();
+    D2::setup();
+    D3::setup();
+    D4::setup();
+    D5::setup();
+    D6::setup();
+    D7::setup();
+    A0::setup();
+    A1::setup();
+    A2::setup();
+    A3::setup();
+    A4::setup();
+    A5::setup();
+    A6::setup();
+    A7::setup();
+    A8::setup();
+    A9::setup();
+    A10::setup();
+    A11::setup();
+    A12::setup();
+    A13::setup();
+    A14::setup();
+    A15::setup();
+    BE::setup();
+    MLB::setup();
+    RWB::setup();
+    RDY::setup<pull_up>();    // using pull-up as this pin is potenially an output on 6502
+    SYNC::setup();
+    SOB::setup();
+    PHI2::setup();
+    PHI1O::setup();
+    PHI2O::setup();
+    RESB::setup();
+    IRQB::setup();
+    NMIB::setup();
+    VBP::setup();
+
+    // initial values
+
+    SOB::set();             // set overflow
+    IRQB::set();            // interrupt request
+    NMIB::set();            // non-maskable interrupt
+    RESB::set();            // don't hold reset
+    PHI2::clear();          // start with low clock
+    BE::set();              // bus enable
+
+    // now the 'computer'
+
+    RESB::clear();
+    delay(1);
+    RESB::set();
+    initialize_memory();
+    load_program(TinyBasic_records, TinyBasic_num_records);
 }
 
 void loop()
@@ -284,24 +309,14 @@ void loop()
     static toggler_t output1(5);
     static toggler_t output2(7);
 
-
-    if (i == 0)     // make sure we have a fresh reset
-    {
-        RESB::clear();
-        delay(1);
-        RESB::set();
-        initialize_memory();
-        load_program(prog2_records, prog2_num_records);
-    }
-
     LED0::set(output0.toggle(i));
     LED1::set(output1.toggle(i));
     LED2::set(output2.toggle(i));
 
- //   int c;
     bool step = false;
+    //int c;
  
-//    while ((c = uart::get_char()) > 0)
+    //while ((c = uart::get_char()) > 0)
         step = true;
 
     if (step)
@@ -340,7 +355,6 @@ void loop()
         {
             data::disable_output();
         }
-       // print_state(i);
         ++i;
     }
 }

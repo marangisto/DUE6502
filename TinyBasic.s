@@ -68,7 +68,7 @@
 ;
 ; Tiny Basic starts here
 ;
-         .org     $8000             ; Start of Basic.
+         .org     $f000             ; Start of Basic.
 
 
 CV       JMP      COLD_S            ; Cold start vector
@@ -1212,20 +1212,17 @@ ILTBL    .byte $24, $3E, $91, $27, $10, $E1, $59, $C5, $2A, $56, $10, $11, $2C, 
 ;
 ; Set some symbols
 ;
-ACIAregs = $F000                    ; Base address of 6850
-ACIAdata = ACIAregs+$01             ; 6850 registers 
+UART_SEND_CHR = $EFF0               ; DUE hook for transmit
+UART_RECV_CHR = UART_SEND_CHR+$01   ; DUE hook for receive char
+UART_RECV_STS = UART_SEND_CHR+$02   ; DUE hook for receive status
 
 
-         .ORG  $F800
+         .ORG  $FE00
 
 ;
 ; Begin base system initialization
 ;
-FBLK     LDA #$03                   ; Reset the ACIA
-         STA ACIAregs               ; Do the reset
-         LDA #$11                   ; 8 bits, 2 stop, divide by 16
-         STA ACIAregs               ; Do the configuration
-         jsr CLRSC                  ; Go clear the screen
+FBLK     jsr CLRSC                  ; Go clear the screen
          ldx #$00                   ; Offset for welcome message and prompt
          jsr SNDMSG                 ; Go print it
 ST_LP    jsr RCCHR                  ; Go get a character from the console
@@ -1282,10 +1279,10 @@ EXSM     rts                        ; Return
 ; Get a character from the ACIA
 ; Runs into SNDCHR to provide echo
 ;
-RCCHR    lda ACIAregs               ; GET STATUS FROM ACIA
+RCCHR    lda UART_RECV_STS          ; GET STATUS FROM ACIA
          lsr                        ; CHECK FOR A CHARACTER
          bcc RCCHR                  ; Loop until we get one
-         LDA ACIAdata               ; GET CHARACTER
+         LDA UART_RECV_CHR          ; GET CHARACTER
 
 ;
 ;Send a character to the ACIA
@@ -1301,12 +1298,8 @@ SNDCHR   sta $FE                    ; Save the character to be printed
          beq EXSC                   ;
          cmp #$80                   ;
          beq EXSC                   ;
-GETSTS   lda ACIAregs               ; GET ACIA STATUS
-         lsr                        ; CHECK TO SEE IF TRANSMITER IS BUSY 
-         lsr                        ;
-         bcc GETSTS                 ; IF STILL BUSY GO GET STATUS AGAIN
          lda $FE                    ; Restore the character
-         STA ACIAdata               ; SEND CHARACTER
+         STA UART_SEND_CHR          ; SEND CHARACTER
 EXSC     rts                        ; Return
 
 ;
@@ -1315,11 +1308,11 @@ EXSC     rts                        ; Return
 ;
 BREAK    sta $FE                    ; Save A
          clc                        ; Clear carry 
-         lda ACIAregs               ; Read the ACAI status to
+         lda UART_RECV_STS          ; Read the ACAI status to
          lsr                        ; Check if there is character in the receiver
          BCC NO_CHR                 ; Finnish up if no character typed
          sec                        ; Set carry (break detected)
-         lda ACIAdata               ; Get the character to reset ACIA status
+         lda UART_RECV_CHR          ; Get the character to reset ACIA status
 NO_CHR   lda $FE                    ; Restore the saved A value
          rts                        ; Return
 
@@ -1328,4 +1321,4 @@ NO_CHR   lda $FE                    ; Restore the saved A value
 ;
          .ORG $FFFC                 ; Address of reset vector
 
-         .word  FBLK                  ; Reset vector
+         .word FBLK                 ; Reset vector
