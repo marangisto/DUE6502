@@ -215,9 +215,9 @@ static inline uint8_t read_memory(uint16_t addr)
     }
     if (addr == uart_recv_chr)
         return chr_val;
-    print("invalid read address: 0x");
-    print(addr, 16, 4);
-    println();
+    //print("invalid read address: 0x");
+    //print(addr, 16, 4);
+    //println();
     return 0;
 }
 
@@ -229,9 +229,9 @@ static inline void write_memory(uint16_t addr, uint8_t x)
         uart::put_char(x);
     else
     {
-        print("invalid write address: 0x");
-        print(addr, 16, 4);
-        println();
+        //print("invalid write address: 0x");
+        //print(addr, 16, 4);
+        //println();
     }
 }
 
@@ -322,7 +322,7 @@ void loop()
     if (step)
     {
         PHI2::toggle();
-        delay(1);
+        //delay(1);
  
         if (PHI2::get())            // rising edge
         {
