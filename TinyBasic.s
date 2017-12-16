@@ -1245,7 +1245,8 @@ MBLK
          .byte  "TINY BASIC - Copyright, Tom Pitman"
          .byte  $0D, $0A, $0A
          .byte  "Boot (C/W)? "
-         .byte  $07, $FF
+         .byte  $FF
+;         .byte  $07, $FF
 
 ;
 ; Begin BIOS subroutines
