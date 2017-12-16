@@ -80,11 +80,11 @@ BV       JMP      BREAK             ; Begin break routine
 ;
 ; Some codes
 ;
-BSC      .db $5f                   ; Backspace code
-LSC      .db $18                   ; Line cancel code
-PCC      .db $80                   ; Pad character control
-TMC      .db $00                   ; Tape mode control
-SSS      .db $04                   ; Spare Stack size. (was $04 but documentation suggests $20)
+BSC      .byte $5f                   ; Backspace code
+LSC      .byte $18                   ; Line cancel code
+PCC      .byte $80                   ; Pad character control
+TMC      .byte $00                   ; Tape mode control
+SSS      .byte $04                   ; Spare Stack size. (was $04 but documentation suggests $20)
 
 ;
 ; Code fragment for 'PEEK' and 'POKE'
@@ -101,57 +101,59 @@ LBL008   LDA ($C2),Y               ; Load A with value pointed to by $C3 (hi) an
 ;
 ; The following table contains the addresses for the ML handlers for the IL opcodes.
 ;
-SRVT     .dw  IL_BBR               ; ($40-$5F) Backward Branch Relative
-         .dw  IL_FBR               ; ($60-$7F) Forward Branch Relative
-         .dw  IL__BC               ; ($80-$9F) String Match Branch
-         .dw  IL__BV               ; ($A0-$BF) Branch if not Variable
-         .dw  IL__BN               ; ($C0-$DF) Branch if not a Number
-         .dw  IL__BE               ; ($E0-$FF) Branch if not End of line
-         .dw  IL__NO               ; ($08) No Opertion
-         .dw  IL__LB               ; ($09) Push Literal Byte onto Stack
-         .dw  IL__LN               ; ($0A) Push Literal Number
-         .dw  IL__DS               ; ($0B) Duplicate Top two bytes on Stack
-         .dw  IL__SP               ; ($0C) Stack Pop
-         .dw  IL__NO               ; ($0D) (Reserved)
-         .dw  IL__NO               ; ($0E) (Reserved)
-         .dw  IL__NO               ; ($0F) (Reserved)
-         .dw  IL__SB               ; ($10) Save Basic Pointer
-         .dw  IL__RB               ; ($11) Restore Basic Pointer
-         .dw  IL__FV               ; ($12) Fetch Variable
-         .dw  IL__SV               ; ($13) Store Variable
-         .dw  IL__GS               ; ($14) Save GOSUB line
-         .dw  IL__RS               ; ($15) Restore saved line
-         .dw  IL__GO               ; ($16) GOTO
-         .dw  IL__NE               ; ($17) Negate
-         .dw  IL__AD               ; ($18) Add
-         .dw  IL__SU               ; ($19) Subtract
-         .dw  IL__MP               ; ($1A) Multiply
-         .dw  IL__DV               ; ($1B) Divide
-         .dw  IL__CP               ; ($1C) Compare
-         .dw  IL__NX               ; ($1D) Next BASIC statement
-         .dw  IL__NO               ; ($1E) (Reserved)
-         .dw  IL__LS               ; ($1F) List the program
-         .dw  IL__PN               ; ($20) Print Number
-         .dw  IL__PQ               ; ($21) Print BASIC string
-         .dw  IL__PT               ; ($22) Print Tab
-         .dw  IL__NL               ; ($23) New Line
-         .dw  IL__PC               ; ($24) Print Literal String
-         .dw  IL__NO               ; ($25) (Reserved)
-         .dw  IL__NO               ; ($26) (Reserved)
-         .dw  IL__GL               ; ($27) Get input Line
-         .dw  ILRES1               ; ($28) (Seems to be reserved - No IL opcode calls this)
-         .dw  ILRES2               ; ($29) (Seems to be reserved - No IL opcode calls this)
-         .dw  IL__IL               ; ($2A) Insert BASIC Line
-         .dw  IL__MT               ; ($2B) Mark the BASIC program space Empty
-         .dw  IL__XQ               ; ($2C) Execute
-         .dw  WARM_S               ; ($2D) Stop (Warm Start)
-         .dw  IL__US               ; ($2E) Machine Language Subroutine Call
-         .dw  IL__RT               ; ($2F) IL subroutine return
+SRVT     .word  IL_BBR               ; ($40-$5F) Backward Branch Relative
+         .word  IL_FBR               ; ($60-$7F) Forward Branch Relative
+         .word  IL__BC               ; ($80-$9F) String Match Branch
+         .word  IL__BV               ; ($A0-$BF) Branch if not Variable
+         .word  IL__BN               ; ($C0-$DF) Branch if not a Number
+         .word  IL__BE               ; ($E0-$FF) Branch if not End of line
+         .word  IL__NO               ; ($08) No Opertion
+         .word  IL__LB               ; ($09) Push Literal Byte onto Stack
+         .word  IL__LN               ; ($0A) Push Literal Number
+         .word  IL__DS               ; ($0B) Duplicate Top two bytes on Stack
+         .word  IL__SP               ; ($0C) Stack Pop
+         .word  IL__NO               ; ($0D) (Reserved)
+         .word  IL__NO               ; ($0E) (Reserved)
+         .word  IL__NO               ; ($0F) (Reserved)
+         .word  IL__SB               ; ($10) Save Basic Pointer
+         .word  IL__RB               ; ($11) Restore Basic Pointer
+         .word  IL__FV               ; ($12) Fetch Variable
+         .word  IL__SV               ; ($13) Store Variable
+         .word  IL__GS               ; ($14) Save GOSUB line
+         .word  IL__RS               ; ($15) Restore saved line
+         .word  IL__GO               ; ($16) GOTO
+         .word  IL__NE               ; ($17) Negate
+         .word  IL__AD               ; ($18) Add
+         .word  IL__SU               ; ($19) Subtract
+         .word  IL__MP               ; ($1A) Multiply
+         .word  IL__DV               ; ($1B) Divide
+         .word  IL__CP               ; ($1C) Compare
+         .word  IL__NX               ; ($1D) Next BASIC statement
+         .word  IL__NO               ; ($1E) (Reserved)
+         .word  IL__LS               ; ($1F) List the program
+         .word  IL__PN               ; ($20) Print Number
+         .word  IL__PQ               ; ($21) Print BASIC string
+         .word  IL__PT               ; ($22) Print Tab
+         .word  IL__NL               ; ($23) New Line
+         .word  IL__PC               ; ($24) Print Literal String
+         .word  IL__NO               ; ($25) (Reserved)
+         .word  IL__NO               ; ($26) (Reserved)
+         .word  IL__GL               ; ($27) Get input Line
+         .word  ILRES1               ; ($28) (Seems to be reserved - No IL opcode calls this)
+         .word  ILRES2               ; ($29) (Seems to be reserved - No IL opcode calls this)
+         .word  IL__IL               ; ($2A) Insert BASIC Line
+         .word  IL__MT               ; ($2B) Mark the BASIC program space Empty
+         .word  IL__XQ               ; ($2C) Execute
+         .word  WARM_S               ; ($2D) Stop (Warm Start)
+         .word  IL__US               ; ($2E) Machine Language Subroutine Call
+         .word  IL__RT               ; ($2F) IL subroutine return
 
-ERRSTR   .dd $2041, $5420          ; " AT " string used in error reporting.  Tom was right about this.
-         .db $80                   ; String terminator
+; ERRSTR   .dd $2041, $5420          ; " AT " string used in error reporting.  Tom was right about this.
+ERRSTR   .word $2041                 ; " AT " string used in error reporting.  Tom was right about this.
+         .word $5420
+         .byte $80                   ; String terminator
          
-LBL002   .dw  ILTBL                ; Address of IL program table
+LBL002   .word  ILTBL                ; Address of IL program table
 
 ;
 ; Begin Cold Start
@@ -229,8 +231,8 @@ LBL006   cld                        ; Make sure we're in binary mode
 ;
 ;
 ;
-         .db $83                   ; No idea about this
-         .db $65                   ; No idea about this
+         .byte $83                   ; No idea about this
+         .byte $65                   ; No idea about this
 ;
 ;
 ; Routine to service the TBIL Instructions
@@ -1177,30 +1179,30 @@ LBL134   jmp OUT_V                  ; Go print it
 ;
 ; TBIL program table
 ;
-ILTBL    .db $24, $3E, $91, $27, $10, $E1, $59, $C5, $2A, $56, $10, $11, $2C, $8B, $4C
-         .db $45, $D4, $A0, $80, $BD, $30, $BC, $E0, $13, $1D, $94, $47, $CF, $88, $54
-         .db $CF, $30, $BC, $E0, $10, $11, $16, $80, $53, $55, $C2, $30, $BC, $E0, $14
-         .db $16, $90, $50, $D2, $83, $49, $4E, $D4, $E5, $71, $88, $BB, $E1, $1D, $8F
-         .db $A2, $21, $58, $6F, $83, $AC, $22, $55, $83, $BA, $24, $93, $E0, $23, $1D
-         .db $30, $BC, $20, $48, $91, $49, $C6, $30, $BC, $31, $34, $30, $BC, $84, $54
-         .db $48, $45, $CE, $1C, $1D, $38, $0D, $9A, $49, $4E, $50, $55, $D4, $A0, $10
-         .db $E7, $24, $3F, $20, $91, $27, $E1, $59, $81, $AC, $30, $BC, $13, $11, $82
-         .db $AC, $4D, $E0, $1D, $89, $52, $45, $54, $55, $52, $CE, $E0, $15, $1D, $85
-         .db $45, $4E, $C4, $E0, $2D, $98, $4C, $49, $53, $D4, $EC, $24, $00, $00, $00
-         .db $00, $0A, $80, $1F, $24, $93, $23, $1D, $30, $BC, $E1, $50, $80, $AC, $59
-         .db $85, $52, $55, $CE, $38, $0A, $86, $43, $4C, $45, $41, $D2, $2B, $84, $52
-         .db $45, $CD, $1D, $A0, $80, $BD, $38, $14, $85, $AD, $30, $D3, $17, $64, $81
-         .db $AB, $30, $D3, $85, $AB, $30, $D3, $18, $5A, $85, $AD, $30, $D3, $19, $54
-         .db $2F, $30, $E2, $85, $AA, $30, $E2, $1A, $5A, $85, $AF, $30, $E2, $1B, $54
-         .db $2F, $98, $52, $4E, $C4, $0A, $80, $80, $12, $0A, $09, $29, $1A, $0A, $1A
-         .db $85, $18, $13, $09, $80, $12, $01, $0B, $31, $30, $61, $72, $0B, $04, $02
-         .db $03, $05, $03, $1B, $1A, $19, $0B, $09, $06, $0A, $00, $00, $1C, $17, $2F
-         .db $8F, $55, $53, $D2, $80, $A8, $30, $BC, $31, $2A, $31, $2A, $80, $A9, $2E
-         .db $2F, $A2, $12, $2F, $C1, $2F, $80, $A8, $30, $BC, $80, $A9, $2F, $83, $AC
-         .db $38, $BC, $0B, $2F, $80, $A8, $52, $2F, $84, $BD, $09, $02, $2F, $8E, $BC
-         .db $84, $BD, $09, $93, $2F, $84, $BE, $09, $05, $2F, $09, $91, $2F, $80, $BE
-         .db $84, $BD, $09, $06, $2F, $84, $BC, $09, $95, $2F, $09, $04, $2F, $00, $00
-         .db $00
+ILTBL    .byte $24, $3E, $91, $27, $10, $E1, $59, $C5, $2A, $56, $10, $11, $2C, $8B, $4C
+         .byte $45, $D4, $A0, $80, $BD, $30, $BC, $E0, $13, $1D, $94, $47, $CF, $88, $54
+         .byte $CF, $30, $BC, $E0, $10, $11, $16, $80, $53, $55, $C2, $30, $BC, $E0, $14
+         .byte $16, $90, $50, $D2, $83, $49, $4E, $D4, $E5, $71, $88, $BB, $E1, $1D, $8F
+         .byte $A2, $21, $58, $6F, $83, $AC, $22, $55, $83, $BA, $24, $93, $E0, $23, $1D
+         .byte $30, $BC, $20, $48, $91, $49, $C6, $30, $BC, $31, $34, $30, $BC, $84, $54
+         .byte $48, $45, $CE, $1C, $1D, $38, $0D, $9A, $49, $4E, $50, $55, $D4, $A0, $10
+         .byte $E7, $24, $3F, $20, $91, $27, $E1, $59, $81, $AC, $30, $BC, $13, $11, $82
+         .byte $AC, $4D, $E0, $1D, $89, $52, $45, $54, $55, $52, $CE, $E0, $15, $1D, $85
+         .byte $45, $4E, $C4, $E0, $2D, $98, $4C, $49, $53, $D4, $EC, $24, $00, $00, $00
+         .byte $00, $0A, $80, $1F, $24, $93, $23, $1D, $30, $BC, $E1, $50, $80, $AC, $59
+         .byte $85, $52, $55, $CE, $38, $0A, $86, $43, $4C, $45, $41, $D2, $2B, $84, $52
+         .byte $45, $CD, $1D, $A0, $80, $BD, $38, $14, $85, $AD, $30, $D3, $17, $64, $81
+         .byte $AB, $30, $D3, $85, $AB, $30, $D3, $18, $5A, $85, $AD, $30, $D3, $19, $54
+         .byte $2F, $30, $E2, $85, $AA, $30, $E2, $1A, $5A, $85, $AF, $30, $E2, $1B, $54
+         .byte $2F, $98, $52, $4E, $C4, $0A, $80, $80, $12, $0A, $09, $29, $1A, $0A, $1A
+         .byte $85, $18, $13, $09, $80, $12, $01, $0B, $31, $30, $61, $72, $0B, $04, $02
+         .byte $03, $05, $03, $1B, $1A, $19, $0B, $09, $06, $0A, $00, $00, $1C, $17, $2F
+         .byte $8F, $55, $53, $D2, $80, $A8, $30, $BC, $31, $2A, $31, $2A, $80, $A9, $2E
+         .byte $2F, $A2, $12, $2F, $C1, $2F, $80, $A8, $30, $BC, $80, $A9, $2F, $83, $AC
+         .byte $38, $BC, $0B, $2F, $80, $A8, $52, $2F, $84, $BD, $09, $02, $2F, $8E, $BC
+         .byte $84, $BD, $09, $93, $2F, $84, $BE, $09, $05, $2F, $09, $91, $2F, $80, $BE
+         .byte $84, $BD, $09, $06, $2F, $84, $BC, $09, $95, $2F, $09, $04, $2F, $00, $00
+         .byte $00
 ;
 ; End of Tiny Basic
 
@@ -1241,12 +1243,12 @@ PRMPT    LDX #$51                   ; Offset of prompt in message block
 ; The message block. It terminates with an FF.
 ;
 MBLK
-         .db  "Open License Monitor, by Bill O'Neill V0.2.2"
-         .db  $0D, $0A, $0A
-         .db  "TINY BASIC - Copyright, Tom Pitman"
-         .db  $0D, $0A, $0A
-         .db  "Boot (C/W)? "
-         .db  $07, $FF
+         .byte  "Open License Monitor, by Bill O'Neill V0.2.2"
+         .byte  $0D, $0A, $0A
+         .byte  "TINY BASIC - Copyright, Tom Pitman"
+         .byte  $0D, $0A, $0A
+         .byte  "Boot (C/W)? "
+         .byte  $07, $FF
 
 ;
 ; Begin BIOS subroutines
@@ -1326,4 +1328,4 @@ NO_CHR   lda $FE                    ; Restore the saved A value
 ;
          .ORG $FFFC                 ; Address of reset vector
 
-         .DW  FBLK                  ; Reset vector
+         .word  FBLK                  ; Reset vector
